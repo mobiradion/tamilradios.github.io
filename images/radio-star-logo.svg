@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Tamil Radios logo</title>
+  <desc id="desc">A clean radio broadcast symbol inside a Tamil-inspired ornamental badge.</desc>
+  <defs>
+    <linearGradient id="badge" x1="16" y1="12" x2="112" y2="116" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff1cf"/>
+      <stop offset="1" stop-color="#e7a64f"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="36" y1="28" x2="92" y2="104" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c94f21"/>
+      <stop offset="1" stop-color="#77270f"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="8" width="112" height="112" rx="32" fill="#fff8ea"/>
+  <circle cx="64" cy="64" r="49" fill="url(#badge)"/>
+  <circle cx="64" cy="64" r="40" fill="#fff8ea" opacity=".88"/>
+
+  <path d="M64 22c9 10 21 17 34 20-6 5-10 11-12 18H42c-2-7-6-13-12-18 13-3 25-10 34-20Z" fill="url(#mark)"/>
+  <path d="M43 59h42" stroke="#8b2f12" stroke-width="6" stroke-linecap="round"/>
+
+  <circle cx="64" cy="69" r="7" fill="#8b2f12"/>
+  <path d="M64 76v28" stroke="#8b2f12" stroke-width="7" stroke-linecap="round"/>
+  <path d="M52 105h24" stroke="#8b2f12" stroke-width="7" stroke-linecap="round"/>
+
+  <path d="M50 52c-7 5-11 13-11 22s4 17 11 22" fill="none" stroke="#c94f21" stroke-width="7" stroke-linecap="round"/>
+  <path d="M78 52c7 5 11 13 11 22s-4 17-11 22" fill="none" stroke="#c94f21" stroke-width="7" stroke-linecap="round"/>
+  <path d="M34 42c-10 8-16 19-16 32s6 24 16 32" fill="none" stroke="#8b2f12" stroke-width="5" stroke-linecap="round" opacity=".48"/>
+  <path d="M94 42c10 8 16 19 16 32s-6 24-16 32" fill="none" stroke="#8b2f12" stroke-width="5" stroke-linecap="round" opacity=".48"/>
+</svg>
