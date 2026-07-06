@@ -17,7 +17,6 @@ const playbackButton = document.getElementById("toggle-playback");
 const playbackIcon = document.getElementById("playback-icon");
 const breadcrumbCurrent = document.getElementById("breadcrumb-current");
 const favoriteButton = document.getElementById("toggle-favorite");
-const favoriteIcon = document.getElementById("favorite-icon");
 const shareButton = document.getElementById("share-station");
 const shareMenu = document.getElementById("share-menu");
 const shareWhatsapp = document.getElementById("share-whatsapp");
@@ -34,7 +33,6 @@ function updatePlaybackIcon() {
 
 function updateFavoriteIcon(station) {
   const favorite = isFavoriteStation(station.streamUrl);
-  favoriteIcon.innerHTML = favorite ? "&#9829;" : "&#9825;";
   favoriteButton.classList.toggle("icon-btn-active", favorite);
   favoriteButton.setAttribute("aria-label", favorite ? "Remove from favorites" : "Add to favorites");
 }
@@ -163,7 +161,6 @@ favoriteButton.addEventListener("click", () => {
     language: currentStation.language || "Tamil"
   });
 
-  favoriteIcon.innerHTML = nextFavoriteState ? "&#9829;" : "&#9825;";
   favoriteButton.classList.toggle("icon-btn-active", nextFavoriteState);
   favoriteButton.setAttribute("aria-label", nextFavoriteState ? "Remove from favorites" : "Add to favorites");
 });
