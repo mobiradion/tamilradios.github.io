@@ -99,6 +99,10 @@ function buildStationUrl(station) {
 }
 
 function updateShareLinks(station) {
+  if (!shareWhatsapp || !shareTwitter || !shareFacebook || !shareTelegram || !copyShareLinkButton) {
+    return;
+  }
+
   const shareUrl = buildStationUrl(station);
   const shareText = `${station.title} - Listen on Radio Star`;
   const encodedUrl = encodeURIComponent(shareUrl);
@@ -165,37 +169,41 @@ favoriteButton.addEventListener("click", () => {
   favoriteButton.setAttribute("aria-label", nextFavoriteState ? "Remove from favorites" : "Add to favorites");
 });
 
-shareButton.addEventListener("click", () => {
-  const isHidden = shareMenu.hasAttribute("hidden");
-  if (isHidden) {
-    shareMenu.removeAttribute("hidden");
-    shareButton.setAttribute("aria-expanded", "true");
-  } else {
-    shareMenu.setAttribute("hidden", "");
-    shareButton.setAttribute("aria-expanded", "false");
-  }
-});
-
-copyShareLinkButton.addEventListener("click", async () => {
-  const shareUrl = copyShareLinkButton.dataset.shareUrl || buildStationUrl(currentStation);
-
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(shareUrl);
-      copyShareLinkButton.textContent = "Copied";
-      setTimeout(() => {
-        copyShareLinkButton.textContent = "Copy Link";
-      }, 1500);
-      return;
+if (shareButton && shareMenu) {
+  shareButton.addEventListener("click", () => {
+    const isHidden = shareMenu.hasAttribute("hidden");
+    if (isHidden) {
+      shareMenu.removeAttribute("hidden");
+      shareButton.setAttribute("aria-expanded", "true");
+    } else {
+      shareMenu.setAttribute("hidden", "");
+      shareButton.setAttribute("aria-expanded", "false");
     }
-  } catch {
-  }
+  });
+}
 
-  window.prompt("Copy this station link:", shareUrl);
-});
+if (copyShareLinkButton) {
+  copyShareLinkButton.addEventListener("click", async () => {
+    const shareUrl = copyShareLinkButton.dataset.shareUrl || buildStationUrl(currentStation);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+        copyShareLinkButton.textContent = "Copied";
+        setTimeout(() => {
+          copyShareLinkButton.textContent = "Copy Link";
+        }, 1500);
+        return;
+      }
+    } catch {
+    }
+
+    window.prompt("Copy this station link:", shareUrl);
+  });
+}
 
 document.addEventListener("click", (event) => {
-  if (!shareMenu.contains(event.target) && !shareButton.contains(event.target)) {
+  if (shareMenu && shareButton && !shareMenu.contains(event.target) && !shareButton.contains(event.target)) {
     shareMenu.setAttribute("hidden", "");
     shareButton.setAttribute("aria-expanded", "false");
   }
