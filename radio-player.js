@@ -67,6 +67,42 @@ function updateNavButtons(index) {
   nextButton.disabled = index >= tamilStations.length - 1;
 }
 
+function resolveStation(station) {
+  const parsedIndex = Number.parseInt(station.index, 10);
+  const normalizedStreamUrl = (station.streamUrl || "").trim();
+
+  if (normalizedStreamUrl) {
+    const matchingIndex = tamilStations.findIndex(
+      (candidate) => (candidate.streamUrl || "").trim() === normalizedStreamUrl
+    );
+
+    if (matchingIndex >= 0) {
+      return {
+        ...tamilStations[matchingIndex],
+        language: station.language || "Tamil",
+        index: matchingIndex
+      };
+    }
+  }
+
+  if (Number.isInteger(parsedIndex) && parsedIndex >= 0 && parsedIndex < tamilStations.length) {
+    return {
+      ...tamilStations[parsedIndex],
+      language: station.language || "Tamil",
+      index: parsedIndex
+    };
+  }
+
+  return {
+    index: Number.isInteger(parsedIndex) ? parsedIndex : -1,
+    title: station.title || "Unknown Station",
+    streamUrl: station.streamUrl || "",
+    description: station.description || "Live radio stream",
+    image: station.image || "",
+    language: station.language || "Tamil"
+  };
+}
+
 function goToStation(index) {
   const station = tamilStations[index];
   if (!station) {
@@ -115,31 +151,29 @@ function updateShareLinks(station) {
   copyShareLinkButton.dataset.shareUrl = shareUrl;
 }
 
-const currentStation =
-  stationIndex >= 0 && stationIndex < tamilStations.length
-    ? { ...tamilStations[stationIndex], language: "Tamil", index: stationIndex }
-    : {
-        index: stationIndex,
-        title,
-        streamUrl,
-        description,
-        image,
-        language
-      };
+const currentStation = resolveStation({
+  index: stationIndex,
+  title,
+  streamUrl,
+  description,
+  image,
+  language
+});
+const currentStationIndex = Number.isInteger(currentStation.index) ? currentStation.index : stationIndex;
 
 updateStationDetails(currentStation);
-updateNavButtons(stationIndex);
+updateNavButtons(currentStationIndex);
 updatePlaybackIcon();
 
 previousButton.addEventListener("click", () => {
-  if (stationIndex > 0) {
-    goToStation(stationIndex - 1);
+  if (currentStationIndex > 0) {
+    goToStation(currentStationIndex - 1);
   }
 });
 
 nextButton.addEventListener("click", () => {
-  if (stationIndex >= 0 && stationIndex < tamilStations.length - 1) {
-    goToStation(stationIndex + 1);
+  if (currentStationIndex >= 0 && currentStationIndex < tamilStations.length - 1) {
+    goToStation(currentStationIndex + 1);
   }
 });
 
@@ -212,7 +246,7 @@ document.addEventListener("click", (event) => {
 playerNode.addEventListener("play", updatePlaybackIcon);
 playerNode.addEventListener("pause", updatePlaybackIcon);
 
-if (!tamilStations.length || stationIndex < 0) {
+if (!tamilStations.length || currentStationIndex < 0) {
   previousButton.disabled = true;
   nextButton.disabled = true;
 }
