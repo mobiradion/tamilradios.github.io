@@ -6,11 +6,11 @@
         "image":  "images/atr.jpg"
     },
     {
-        "title":  "CIR",
-        "streamUrl":  "http://220.247.234.207:8000/cirstream",
-        "description":  "Colombo International  Radio Live ",
-        "image":  "images/Colombo-International-Radio.jpg"
-    },
+        "title":  "CTBC Radio",
+        "streamUrl":  "https://radio.massstream.net:7003/Muthamil.mp3",
+        "description":  "CTBC Radio Canadian Tamil Broadcasting Corporation is Worlds first 24 hours Tamil Radio station operating from Toronto, Canada.CTBC Radio plays programmes for Tamil persons in canada.Listen to Canadian Tamil Broadcasting Corporation radio station online. உலகின் முதல் 24 மணிநேர தனித் தமிழ் வானொலி",
+        "image":  "images/ctbc.jpg"
+    },    
     {
         "title":  "Inbathamil oli",
         "streamUrl":  "https://usa7.fastcast4u.com/proxy/ozmediae?mp=/1",
@@ -454,13 +454,7 @@
         "streamUrl":  "https://stream.zeno.fm/nxb2dpmmhm8uv",
         "description":  "Yaazhisai FM is a Tamil music based FM Radio Station.With Yaazhisai FM you can feel good when hering our fm radio station this channel will telecast tamil movies, religious and gods songs… we will telecast innovative Tamil programs and Tamil songs.Listen to Yaazhisai radio station online.",
         "image":  "images/yaazhisai.jpg"
-    },
-    {
-        "title":  "CTBC Radio",
-        "streamUrl":  "https://radio.massstream.net:7003/Muthamil.mp3",
-        "description":  "CTBC Radio Canadian Tamil Broadcasting Corporation is Worlds first 24 hours Tamil Radio station operating from Toronto, Canada.CTBC Radio plays programmes for Tamil persons in canada.Listen to Canadian Tamil Broadcasting Corporation radio station online. உலகின் முதல் 24 மணிநேர தனித் தமிழ் வானொலி",
-        "image":  "images/ctbc.jpg"
-    },
+    },    
     {
         "title":  "Mukil FM Radio",
         "streamUrl":  "https://stream.zeno.fm/phv06yfkwzzuv",
@@ -628,6 +622,12 @@
         "streamUrl":  "https://thenaruvivaanoli.radioca.st/stream",
         "description":  "Thenaruvi FM is a Tamil online radio station playing from Tamilnadu.It plays the best of Tamil songs and Has Live RJ,Listen to Then aruvi fm Radio station online.",
         "image":  "images/thearuvifm.jpg"
+    },
+    {
+        "title":  "CIR",
+        "streamUrl":  "http://220.247.234.207:8000/cirstream",
+        "description":  "Colombo International  Radio Live ",
+        "image":  "images/Colombo-International-Radio.jpg"
     },
     {
         "title":  "Vividh Bharati",
