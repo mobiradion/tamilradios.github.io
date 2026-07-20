@@ -24,32 +24,84 @@ const shareTwitter = document.getElementById("share-twitter");
 const shareFacebook = document.getElementById("share-facebook");
 const shareTelegram = document.getElementById("share-telegram");
 const copyShareLinkButton = document.getElementById("copy-share-link");
+let activeHlsInstance = null;
+
+function safeAddEventListener(element, eventName, handler) {
+  if (element) {
+    element.addEventListener(eventName, handler);
+  }
+}
 
 function updatePlaybackIcon() {
+  if (!playerNode || !playbackIcon || !playbackButton) {
+    return;
+  }
+
   const isPaused = playerNode.paused;
   playbackIcon.innerHTML = isPaused ? "&#9654;" : "&#10074;&#10074;";
   playbackButton.setAttribute("aria-label", isPaused ? "Play station" : "Pause station");
 }
 
 function updateFavoriteIcon(station) {
+  if (!favoriteButton) {
+    return;
+  }
+
   const favorite = isFavoriteStation(station.streamUrl);
   favoriteButton.classList.toggle("icon-btn-active", favorite);
   favoriteButton.setAttribute("aria-label", favorite ? "Remove from favorites" : "Add to favorites");
 }
 
-function updateStationDetails(station) {
-  descriptionNode.textContent = station.description || "Live radio stream";
-  breadcrumbCurrent.textContent = station.title;
-  imageNode.src = station.image || "";
-  imageNode.alt = station.title;
-
-  if (station.streamUrl) {
-    playerNode.src = station.streamUrl;
-    playerNode.play().catch(() => {});
-  } else {
-    playerNode.removeAttribute("src");
-    descriptionNode.textContent = "This station is missing a valid stream URL.";
+function stopActiveHlsStream() {
+  if (activeHlsInstance) {
+    activeHlsInstance.destroy();
+    activeHlsInstance = null;
   }
+}
+
+function loadStationStream(station) {
+  if (!playerNode) {
+    return;
+  }
+
+  stopActiveHlsStream();
+  playerNode.pause();
+  playerNode.removeAttribute("src");
+  playerNode.load();
+
+  if (!station.streamUrl) {
+    if (descriptionNode) {
+      descriptionNode.textContent = "This station is missing a valid stream URL.";
+    }
+    return;
+  }
+
+  const isHlsStream = /\.m3u8($|\?)/i.test(station.streamUrl);
+
+  if (isHlsStream && window.Hls && window.Hls.isSupported()) {
+    activeHlsInstance = new window.Hls();
+    activeHlsInstance.loadSource(station.streamUrl);
+    activeHlsInstance.attachMedia(playerNode);
+  } else {
+    playerNode.src = station.streamUrl;
+  }
+
+  playerNode.play().catch(() => {});
+}
+
+function updateStationDetails(station) {
+  if (descriptionNode) {
+    descriptionNode.textContent = station.description || "Live radio stream";
+  }
+  if (breadcrumbCurrent) {
+    breadcrumbCurrent.textContent = station.title;
+  }
+  if (imageNode) {
+    imageNode.src = station.image || "";
+    imageNode.alt = station.title;
+  }
+
+  loadStationStream(station);
 
   updatePlaybackIcon();
   updateFavoriteIcon(station);
@@ -58,13 +110,21 @@ function updateStationDetails(station) {
 
 function updateNavButtons(index) {
   if (!tamilStations.length) {
-    previousButton.disabled = true;
-    nextButton.disabled = true;
+    if (previousButton) {
+      previousButton.disabled = true;
+    }
+    if (nextButton) {
+      nextButton.disabled = true;
+    }
     return;
   }
 
-  previousButton.disabled = index <= 0;
-  nextButton.disabled = index >= tamilStations.length - 1;
+  if (previousButton) {
+    previousButton.disabled = index <= 0;
+  }
+  if (nextButton) {
+    nextButton.disabled = index >= tamilStations.length - 1;
+  }
 }
 
 function resolveStation(station) {
@@ -165,20 +225,20 @@ updateStationDetails(currentStation);
 updateNavButtons(currentStationIndex);
 updatePlaybackIcon();
 
-previousButton.addEventListener("click", () => {
+safeAddEventListener(previousButton, "click", () => {
   if (currentStationIndex > 0) {
     goToStation(currentStationIndex - 1);
   }
 });
 
-nextButton.addEventListener("click", () => {
+safeAddEventListener(nextButton, "click", () => {
   if (currentStationIndex >= 0 && currentStationIndex < tamilStations.length - 1) {
     goToStation(currentStationIndex + 1);
   }
 });
 
-playbackButton.addEventListener("click", () => {
-  if (!playerNode.src) {
+safeAddEventListener(playbackButton, "click", () => {
+  if (!playerNode || !playerNode.src) {
     return;
   }
 
@@ -189,7 +249,11 @@ playbackButton.addEventListener("click", () => {
   }
 });
 
-favoriteButton.addEventListener("click", () => {
+safeAddEventListener(favoriteButton, "click", () => {
+  if (!currentStation || !favoriteButton) {
+    return;
+  }
+
   const nextFavoriteState = toggleFavoriteStation({
     index: currentStation.index,
     title: currentStation.title,
@@ -204,7 +268,7 @@ favoriteButton.addEventListener("click", () => {
 });
 
 if (shareButton && shareMenu) {
-  shareButton.addEventListener("click", () => {
+  safeAddEventListener(shareButton, "click", () => {
     const isHidden = shareMenu.hasAttribute("hidden");
     if (isHidden) {
       shareMenu.removeAttribute("hidden");
@@ -217,7 +281,7 @@ if (shareButton && shareMenu) {
 }
 
 if (copyShareLinkButton) {
-  copyShareLinkButton.addEventListener("click", async () => {
+  safeAddEventListener(copyShareLinkButton, "click", async () => {
     const shareUrl = copyShareLinkButton.dataset.shareUrl || buildStationUrl(currentStation);
 
     try {
@@ -243,10 +307,20 @@ document.addEventListener("click", (event) => {
   }
 });
 
-playerNode.addEventListener("play", updatePlaybackIcon);
-playerNode.addEventListener("pause", updatePlaybackIcon);
+safeAddEventListener(playerNode, "play", updatePlaybackIcon);
+safeAddEventListener(playerNode, "pause", updatePlaybackIcon);
+safeAddEventListener(playerNode, "error", () => {
+  if (descriptionNode) {
+    descriptionNode.textContent = "This station could not be loaded. Please try another stream.";
+  }
+  updatePlaybackIcon();
+});
 
 if (!tamilStations.length || currentStationIndex < 0) {
-  previousButton.disabled = true;
-  nextButton.disabled = true;
+  if (previousButton) {
+    previousButton.disabled = true;
+  }
+  if (nextButton) {
+    nextButton.disabled = true;
+  }
 }
