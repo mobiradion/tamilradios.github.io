@@ -25,6 +25,9 @@ const shareFacebook = document.getElementById("share-facebook");
 const shareTelegram = document.getElementById("share-telegram");
 const copyShareLinkButton = document.getElementById("copy-share-link");
 let activeHlsInstance = null;
+let reconnectTimer = null;
+let reconnectAttempts = 0;
+let currentStationForPlayback = null;
 
 function safeAddEventListener(element, eventName, handler) {
   if (element) {
@@ -59,11 +62,37 @@ function stopActiveHlsStream() {
   }
 }
 
+function clearReconnectTimer() {
+  if (reconnectTimer) {
+    window.clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
+}
+
+function scheduleStreamRecovery(station) {
+  if (!station || !station.streamUrl || !playerNode) {
+    return;
+  }
+
+  clearReconnectTimer();
+  reconnectAttempts += 1;
+  const delayMs = Math.min(15000, 4000 + reconnectAttempts * 2000);
+
+  reconnectTimer = window.setTimeout(() => {
+    reconnectTimer = null;
+    loadStationStream(station);
+  }, delayMs);
+}
+
 function loadStationStream(station) {
   if (!playerNode) {
     return;
   }
 
+  currentStationForPlayback = station;
+  clearReconnectTimer();
+  reconnectAttempts = 0;
+  playerNode.setAttribute("playsinline", "true");
   stopActiveHlsStream();
   playerNode.pause();
   playerNode.removeAttribute("src");
@@ -86,7 +115,11 @@ function loadStationStream(station) {
     playerNode.src = station.streamUrl;
   }
 
-  playerNode.play().catch(() => {});
+  playerNode.play().catch(() => {
+    if (station.streamUrl) {
+      scheduleStreamRecovery(station);
+    }
+  });
 }
 
 function updateStationDetails(station) {
@@ -238,12 +271,16 @@ safeAddEventListener(nextButton, "click", () => {
 });
 
 safeAddEventListener(playbackButton, "click", () => {
-  if (!playerNode || !playerNode.src) {
+  if (!playerNode) {
     return;
   }
 
   if (playerNode.paused) {
-    playerNode.play().catch(() => {});
+    playerNode.play().catch(() => {
+      if (currentStationForPlayback?.streamUrl) {
+        scheduleStreamRecovery(currentStationForPlayback);
+      }
+    });
   } else {
     playerNode.pause();
   }
@@ -314,6 +351,19 @@ safeAddEventListener(playerNode, "error", () => {
     descriptionNode.textContent = "This station could not be loaded. Please try another stream.";
   }
   updatePlaybackIcon();
+  if (currentStationForPlayback?.streamUrl) {
+    scheduleStreamRecovery(currentStationForPlayback);
+  }
+});
+safeAddEventListener(playerNode, "stalled", () => {
+  if (currentStationForPlayback?.streamUrl) {
+    scheduleStreamRecovery(currentStationForPlayback);
+  }
+});
+safeAddEventListener(playerNode, "ended", () => {
+  if (currentStationForPlayback?.streamUrl) {
+    scheduleStreamRecovery(currentStationForPlayback);
+  }
 });
 
 if (!tamilStations.length || currentStationIndex < 0) {
